@@ -10,10 +10,10 @@
 .svn/
 migrate_working_dir/
 # folder
-.ios/
-.macos/
-.windows/
-.web/
+ios/
+macos/
+windows/
+web/
 
 
 # IntelliJ related
