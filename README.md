@@ -304,17 +304,17 @@ class MessageFieldBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final colors = Theme.of(context).colorScheme; <- Obtenemos colores
 
-    final outLineInputBorder = UnderlineInputBorder(
+    final outLineInputBorder = UnderlineInputBorder( <- estilos del borde
         borderSide: BorderSide(color: colors.primary),
         borderRadius: BorderRadius.circular(40));
 
-    final inputDecoration = InputDecoration(
+    final inputDecoration = InputDecoration( <- stilos del input
       enabledBorder: outLineInputBorder,
       focusedBorder: outLineInputBorder,
       filled: true,
-      suffixIcon: IconButton(
+      suffixIcon: IconButton( <- agregamos un icono
         icon: const Icon(Icons.send_outlined),
         onPressed: () {
           print('Valor de la caja de texto ');
@@ -323,12 +323,64 @@ class MessageFieldBox extends StatelessWidget {
     );
 
     return TextFormField(
+      decoration: inputDecoration, <- estilos que tiene el textformfield
+      onFieldSubmitted: (value) { <- cuando hacemos el submit
+        print('Submit value $value');
+      },
+      onChanged: (value) { <- cuando cambiamos algun valor
+        print('onChanged value $value');
+      },
+    );
+  }
+}
+```
+
+## Comportamiento del formfield
+
+```
+import 'package:flutter/material.dart';
+
+class MessageFieldBox extends StatelessWidget {
+  const MessageFieldBox({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final textController = TextEditingController(); <- obtenemos el texto
+    final focusNode = FocusNode(); <- obtenemos el foco del elemento para poder usarlo
+
+    final colors = Theme.of(context).colorScheme;
+
+    final outLineInputBorder = UnderlineInputBorder(
+        borderSide: BorderSide(color: colors.primary),
+        borderRadius: BorderRadius.circular(40));
+
+    final inputDecoration = InputDecoration(
+      hintText: 'End your message with a "??"', <- placeholder
+      enabledBorder: outLineInputBorder, <- estilos cuando esta habilitado
+      focusedBorder: outLineInputBorder, <- estilos cuando esta focuseado
+      filled: true,
+      suffixIcon: IconButton(
+        icon: const Icon(Icons.send_outlined),
+        onPressed: () {
+          final textValue = textController.value.text;
+          print('Valor de la caja de texto: $textValue ');
+          textController.clear(); <- limpiamos el texto
+        },
+      ),
+    );
+
+    return TextFormField(
+      onTapOutside: (event) { <- evento que sucede cuando hacemos click fuera
+        focusNode.unfocus(); <- quitamos el foco del widget
+      },
+      keyboardAppearance: colors.brightness, <- modifica apariencia del teclado
+      focusNode: focusNode, <- mantenga el foco
+      controller: textController,
       decoration: inputDecoration,
       onFieldSubmitted: (value) {
         print('Submit value $value');
-      },
-      onChanged: (value) {
-        print('onChanged value $value');
+        textController.clear();
+        focusNode.requestFocus(); <- mantenemos el foco
       },
     );
   }
