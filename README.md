@@ -50,6 +50,8 @@ ClipRRect (bordes redondeados)
 Para generar un esqueleto de aplicacion podemos usar el snipped `mate`.
 Para quitar la banda de debugg mode usamos `debugShowCheckedModeBanner` y lo ponemos en `false`.
 Si queremos un boton relleno podemos usar `FilledButton.tonal(onPressed: () {}, child: const Text('Click me')),` este botono no puede ser constante per su texto si.
+`stless` -> para crear un widget stateless.
+para ver emoticones `windows + .`
 
 ## Cambiar Color de la Aplicacion
 
@@ -97,3 +99,69 @@ Para usar esta clase tenemos q importarla y luego invocarlas
 ```
     theme: AppTheme(selectedColor: 4).theme(),
 ```
+
+## Widget ChatScreen
+
+```
+import 'package:flutter/material.dart';
+
+class ChatScreen extends StatelessWidget {
+  const ChatScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(
+                'https://cdn-icons-png.flaticon.com/256/3874/3874001.png'),
+          ),
+        ),
+        title: const Text('Mi amor ❤'),
+        centerTitle: true,
+      ),
+    );
+  }
+}
+```
+
+Importamos material y con el snipped creamos el Stateless Widget. Este retorna un Scaffold que tiene muchas cosas como `appBar` de tipo `AppBar`, aca ponemos las propiedades de `leading:` que sirve para tene un pequeño incono en la parte superior izquierda.
+. `CircleAvatar()` el cual es in circulo para pones desde imagenes.
+. `Icons.` con esto podemos elegir un icono.
+. `Padding` que sirve para reducir el tamaño.
+
+## ListView
+
+En el `body` del `Scaffold` podemos crear un Container que vendria a ser como un div que requiere dimensiones o un `Expanded()` el cual usa todo el tamaño de la pantalla.
+Dentro del `body` podemos llamar a una clase que devuelva un `ListView.builder()` que requiere `itemBuilder` para renderizar elementos.
+El `SafeArea` es un widget que permite dejar espacio para los botones de la pantalla.
+El `Padding` con un `padding` de `EdgeInsets.symmetric(horizontal: 20)` nos permite dejar un espacio en el eje X.
+Se usa un Widget `Column` para tener los child uno encima del otro.
+
+```
+class _ChatView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            Expanded(child: ListView.builder(
+              itemBuilder: (context, index) {
+                return Text('Indice: $index');
+              },
+            )),
+            Text('Hola'),
+            Text('Mundo')
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Mis Mensajes - Burbuja de Chat
