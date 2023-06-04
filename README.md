@@ -407,3 +407,41 @@ class Message {
 ```
 
 Con este codigo hacems un `enum`. Y inicializamos la clase pidiendo en el constructor que los valores de text y fromWho sean requeridos.
+
+## Install Packet
+
+Para instalar un paquete podemos buscarlos en pub.dev. Y asegurarnos que es compatible con el entrono de trabajo que tenemos.
+Para instalar un paquete podemos usar el comando
+
+```
+flutter pub add provider
+```
+
+Otra forma es agregarlo en el archivo `pubspec.yaml`.
+Y la ultima es usar la extension de VSC llamada Pubspec Assist que permite instalar desde el promt de vsc.
+
+## Uso Provider
+
+Una vez instalado el provider podemos usarlo en el rango mas alto de aplicacion para que pueda ser usado en toda las widgets que lo necesiten.
+
+```
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ChatProvider())],
+      child: MaterialApp(
+          title: 'Yes No App',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme(selectedColor: 0).theme(),
+          home: const ChatScreen()),
+    );
+  }
+}
+```
+
+En el main podemos envolver la aplicaicon en un `MultiProvider` el cual requeire el o los providers que son lo elementos que se compartiran.
