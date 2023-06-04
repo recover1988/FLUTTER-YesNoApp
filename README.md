@@ -465,3 +465,151 @@ class ChatProvider extends ChangeNotifier {
   }
 }
 ```
+
+### Añadir mensajes al provider
+
+Para esto tenemos que añadir un metodo al `chat_provider.dart` que agregue datos o `Message` a la lista que se encuentra en el estado.
+Se puede ver que estamos añadiendo el metodo `sendMessage` que agrega a la lista y luego con el `notifyListeners()` le decimos que renderize.
+
+```
+lib\presentation\providers\chat_provider.dart
+
+import 'package:flutter/material.dart';
+import 'package:yes_no_app/domain/entities/message.dart';
+
+class ChatProvider extends ChangeNotifier {
+  List<Message> messageList = [
+    Message(text: 'Hola', fromWho: FromWho.me),
+    Message(text: 'Ya regresaste del trabajo', fromWho: FromWho.me)
+  ];
+
+  Future<void> sendMessage(String text) async {
+    final newMessage = Message(text: text, fromWho: FromWho.me);
+    messageList.add(newMessage);
+    notifyListeners();
+  }
+}
+```
+
+De la caja de texto hacemos que el mensaje se guarde en una variable para luego utilizarla cuando se sube.
+
+```
+lib\presentation\widgets\shared\message_field_box.dart
+
+import 'package:flutter/material.dart';
+
+class MessageFieldBox extends StatelessWidget {
+  final ValueChanged<String> onValue;    <---
+  const MessageFieldBox({super.key, required this.onValue});
+
+  @override
+  Widget build(BuildContext context) {
+    final textController = TextEditingController();
+    final focusNode = FocusNode();
+
+    final colors = Theme.of(context).colorScheme;
+
+    final outLineInputBorder = UnderlineInputBorder(
+        borderSide: BorderSide(color: colors.primary),
+        borderRadius: BorderRadius.circular(40));
+
+    final inputDecoration = InputDecoration(
+      hintText: 'End your message with a "?"',
+      enabledBorder: outLineInputBorder,
+      focusedBorder: outLineInputBorder,
+      filled: true,
+      suffixIcon: IconButton(
+        icon: const Icon(Icons.send_outlined),
+        onPressed: () {
+          final textValue = textController.value.text;
+          onValue(textValue);        <---
+          textController.clear();
+        },
+      ),
+    );
+
+    return TextFormField(
+      onTapOutside: (event) {
+        focusNode.unfocus();
+      },
+      keyboardAppearance: colors.brightness,
+      focusNode: focusNode,
+      controller: textController,
+      decoration: inputDecoration,
+      onFieldSubmitted: (value) {
+        onValue(value);         <---
+        textController.clear();
+        focusNode.requestFocus();
+      },
+    );
+  }
+}
+```
+
+Y por ultimo unimos todo donde tenemos instaciada el provider que es el `chat_screen.dart` .
+
+```
+lib\presentation\screens\chat\chat_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yes_no_app/domain/entities/message.dart';
+import 'package:yes_no_app/presentation/providers/chat_provider.dart';
+import 'package:yes_no_app/presentation/widgets/chat/her_message_bubble.dart';
+import 'package:yes_no_app/presentation/widgets/chat/my_message_bubble.dart';
+import 'package:yes_no_app/presentation/widgets/shared/message_field_box.dart';
+
+class ChatScreen extends StatelessWidget {
+  const ChatScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(
+                'https://cdn-icons-png.flaticon.com/256/3874/3874001.png'),
+          ),
+        ),
+        title: const Text('Mi amor ❤'),
+        centerTitle: true,
+      ),
+      body: _ChatView(),
+    );
+  }
+}
+
+class _ChatView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final chatProvider = context.watch<ChatProvider>();
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            Expanded(
+                child: ListView.builder(
+              itemCount: chatProvider.messageList.length,
+              itemBuilder: (context, index) {
+                final message = chatProvider.messageList[index];
+                return (message.fromWho == FromWho.hers)
+                    ? const HerMessageBubble()
+                    : MyMessageBubble(message: message);
+              },
+            )),
+            // Caja de Texto          <--------
+            MessageFieldBox(
+              // onValue: (String value) => chatProvider.sendMessage(value),
+              onValue: chatProvider.sendMessage,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
