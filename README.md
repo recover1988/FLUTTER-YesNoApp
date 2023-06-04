@@ -386,3 +386,24 @@ class MessageFieldBox extends StatelessWidget {
   }
 }
 ```
+
+## Entidad - Message
+
+Para la logica de negocio tenemos que usar Dart puro, ya que estos no se crea widget.
+
+```
+lib/domain/entities/message.dart
+
+enum FromWho { mine, hers }
+
+class Message {
+  final String text;
+  final String? imageUrl;
+  final FromWho fromWho;
+
+  Message({required this.text, this.imageUrl, required this.fromWho});
+}
+
+```
+
+Con este codigo hacems un `enum`. Y inicializamos la clase pidiendo en el constructor que los valores de text y fromWho sean requeridos.
