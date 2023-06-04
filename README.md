@@ -445,3 +445,23 @@ class MyApp extends StatelessWidget {
 ```
 
 En el main podemos envolver la aplicaicon en un `MultiProvider` el cual requeire el o los providers que son lo elementos que se compartiran.
+
+### Chat Provider
+
+El ChatProvider es la instancia que se va a guardar en el estado
+
+```
+import 'package:flutter/material.dart';
+import 'package:yes_no_app/domain/entities/message.dart';
+
+class ChatProvider extends ChangeNotifier {
+  List<Message> messageList = [
+    Message(text: 'Hola', fromWho: FromWho.me),
+    Message(text: 'Ya regresaste del trabajo', fromWho: FromWho.me)
+  ];
+
+  Future<void> sendMessage(String text) async {
+    //todo: implementar metodo.
+  }
+}
+```
