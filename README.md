@@ -718,3 +718,62 @@ En el provider haremos uso de esta clase:
    final herMessage = await getYesNoAnswer.getAnswer();
  }
 ```
+
+## Mappear Response
+
+Para mapear la respuesta podemos usar Quick.io que nos genera el codigo de la API, luego le agregamos un metodo para retornar los datos mapeados a como lo necesitamos en este caso de tipo Message.
+
+```
+// To parse this JSON data, do
+//
+//     final yesNoModel = yesNoModelFromJson(jsonString);
+
+import 'package:yes_no_app/domain/entities/message.dart';
+
+class YesNoModel {
+  final String answer;
+  final bool forced;
+  final String image;
+
+  YesNoModel({
+    required this.answer,
+    required this.forced,
+    required this.image,
+  });
+
+  factory YesNoModel.fromJsonMap(Map<String, dynamic> json) => YesNoModel(
+        answer: json["answer"],
+        forced: json["forced"],
+        image: json["image"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "answer": answer,
+        "forced": forced,
+        "image": image,
+      };
+  Message toMessageEntity() => Message(
+      text: answer == 'yes' ? 'Si' : 'No',
+      fromWho: FromWho.hers,
+      imageUrl: image);
+}
+```
+
+Y en la llamada a la api simplemente usamos esta clase para generar la respuesta:
+
+````
+import 'package:dio/dio.dart';
+import 'package:yes_no_app/infrastructure/models/yes_no_model.dart';
+
+import '../../domain/entities/message.dart';
+
+class GetYesNoAnswer {
+  final _dio = Dio();
+  Future<Message> getAnswer() async {
+    final response = await _dio.get('https://yesno.wtf/api');
+    final yesNoModel = YesNoModel.fromJsonMap(response.data);
+    return yesNoModel.toMessageEntity();
+  }
+}
+    ```
+````
