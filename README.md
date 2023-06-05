@@ -684,3 +684,37 @@ class ChatProvider extends ChangeNotifier {
 }
 
 ```
+
+## Packge Dio
+
+Para realizar peticiones a alguna API podemos usar paquetes como http o dio que se encuentran en el pub.dev.
+En este caso instalaremos dio, con el comando
+
+```
+flutter pub add dio
+```
+
+Una vez instalada podemos generar la peticion get de la siguiente forma:
+
+```
+import 'package:dio/dio.dart';
+
+import '../../domain/entities/message.dart';
+
+class GetYesNoAnswer {
+  final _dio = Dio();
+  Future<Message> getAnswer() async {
+    final response = await _dio.get('https://yesno.wtf/api');
+    throw UnimplementedError();
+  }
+}
+```
+
+Instaciamos la clase `Dio()` y creamos un metodo `getAnswer` de tipo asincrona y con el metodo get.
+En el provider haremos uso de esta clase:
+
+```
+  Future<void> herReply() async {
+   final herMessage = await getYesNoAnswer.getAnswer();
+ }
+```
