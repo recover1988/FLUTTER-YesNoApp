@@ -613,3 +613,74 @@ class _ChatView extends StatelessWidget {
   }
 }
 ```
+
+## Mover el Scroll al final
+
+Primero hacemos la conexion del controlador del `ListView.builder()` con el controlador del `chatProvider`, de esta forma podemos manejar el scroll desde el provider.
+
+```
+class _ChatView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final chatProvider = context.watch<ChatProvider>();
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            Expanded(
+                child: ListView.builder(
+              controller: chatProvider.chatScrollController,
+              itemCount: chatProvider.messageList.length,
+              itemBuilder: (context, index) {
+                final message = chatProvider.messageList[index];
+                return (message.fromWho == FromWho.hers)
+                    ? const HerMessageBubble()
+                    : MyMessageBubble(message: message);
+              },
+            )),
+            // Caja de Texto
+            MessageFieldBox(
+              // onValue: (String value) => chatProvider.sendMessage(value),
+              onValue: chatProvider.sendMessage,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+En el provider creamos la variable final ` final ScrollController chatScrollController = ScrollController();` y con la funcion `moveScrollToBottom` hacemos que se vea en la parte de abajo.
+
+```
+import 'package:flutter/material.dart';
+import 'package:yes_no_app/domain/entities/message.dart';
+
+class ChatProvider extends ChangeNotifier {
+  final ScrollController chatScrollController = ScrollController();
+  List<Message> messageList = [
+    Message(text: 'Hola', fromWho: FromWho.me),
+    Message(text: 'Ya regresaste del trabajo', fromWho: FromWho.me)
+  ];
+
+  Future<void> sendMessage(String text) async {
+    if (text.isEmpty) return;
+    final newMessage = Message(text: text, fromWho: FromWho.me);
+    messageList.add(newMessage);
+    notifyListeners();
+    moveScrollToBottom();
+  }
+
+  void moveScrollToBottom() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    chatScrollController.animateTo(
+        chatScrollController.position.maxScrollExtent, <- Fijamos posiciones
+        duration: const Duration(milliseconds: 300),  <- ponemos duracion
+        curve: Curves.easeOut); <- le damos la animacion
+  }
+}
+
+```
